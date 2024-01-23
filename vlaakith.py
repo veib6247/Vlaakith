@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 
 import pandas as pd
 
@@ -101,32 +101,36 @@ class Vlaakith:
             self.label_selected_output_dir['text'] = output_dir
 
     # start process
-
     def build_file(self) -> None:
         # init
         payload_directory = self.selected_payload_directory
         output_directory = self.selected_output_directory
         frames = []
 
-        # loop through each csv file in dir
-        for file in os.listdir(payload_directory):
-            if file.endswith('.csv'):
-                try:
-                    df = pd.read_csv(
-                        f'{payload_directory}/{file}',
-                        encoding='ISO-8859-1',
-                        index_col='ShortId'
-                    )
+        try:
+            # loop through each csv file in dir
+            for file in os.listdir(payload_directory):
+                if file.endswith('.csv'):
+                    try:
+                        df = pd.read_csv(
+                            f'{payload_directory}/{file}',
+                            encoding='ISO-8859-1',
+                            index_col='ShortId'
+                        )
 
-                    # add each new df to a list
-                    frames.append(df)
+                        # add each new df to a list
+                        frames.append(df)
 
-                except Exception as e:
-                    print(e)
+                    except Exception as e:
+                        messagebox.showerror('Error', e)
 
-        # concat all dataframes from the list to 1 singular dataframe and output the csv
-        df_merged = pd.concat(frames)
-        df_merged.to_csv(f'{output_directory}/concatenated.csv')
+            # concat all dataframes from the list to 1 singular dataframe and output the csv
+            df_merged = pd.concat(frames)
+            df_merged.to_csv(f'{output_directory}/concatenated.csv')
+            messagebox.showinfo('Success', 'Processing completed')
+
+        except Exception as e:
+            messagebox.showerror('Error', e)
 
 
 def main():
