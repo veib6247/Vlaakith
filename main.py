@@ -93,7 +93,6 @@ class Vlaakith:
             self.label_selected_payload_dir['text'] = payload_dir
 
     # set the output dir
-
     def get_output_dir(self) -> None:
         output_dir = filedialog.askdirectory()
 
