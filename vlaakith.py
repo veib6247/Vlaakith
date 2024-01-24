@@ -1,88 +1,97 @@
 import os
-import tkinter as tk
-from tkinter import filedialog, messagebox
 
+import customtkinter
 import pandas as pd
+from CTkMessagebox import CTkMessagebox
+from customtkinter import filedialog
 
 
 class Vlaakith:
     def __init__(self) -> None:
-        # build main window
-        self.main_window = tk.Tk()
-        self.main_window.geometry('800x200')
-        self.main_window.resizable(False, False)
-        self.main_window.title('Vlaakith | BIP Export Concatenator')
-        self.selected_payload_directory = 'Please select a payload directory...'
-        self.selected_output_directory = 'Please select an output directory...'
+        # theming
+        customtkinter.set_appearance_mode('System')
+        customtkinter.set_default_color_theme('dark-blue')
 
-        # payload button
-        self.btn_get_payload_dir = tk.Button(
-            self.main_window,
-            text='Payload Directory',
-            command=self.get_payload_dir
-        )
+        # build window
+        self.app = customtkinter.CTk()
+        self.app.title('Vlaakith | BIP Export Concatenator')
+        self.selected_payload_directory = 'Select a payload directory...'
+        self.selected_output_directory = 'Select an output directory...'
 
-        self.btn_get_payload_dir.place(
-            x=20,
-            y=20,
+        # get payload button
+        self.btn_get_payload_dir = customtkinter.CTkButton(
+            master=self.app,
+            text='Select Payload Directory',
+            command=self.get_payload_dir,
             height=30,
             width=160
         )
 
-        # payload label
-        self.label_selected_payload_dir = tk.Label(
-            self.main_window,
-            text=self.selected_payload_directory
+        self.btn_get_payload_dir.place(
+            x=20,
+            y=20
+        )
+
+        # selected payload label
+        self.label_selected_payload_dir = customtkinter.CTkLabel(
+            master=self.app,
+            text=self.selected_payload_directory,
+            height=30
         )
 
         self.label_selected_payload_dir.place(
             x=200,
             y=20,
-            height=30
         )
 
-        # output btn
-        self.btn_get_output_dir = tk.Button(
-            self.main_window,
-            text='Output Directory',
-            command=self.get_output_dir
-        )
-
-        self.btn_get_output_dir.place(
-            x=20,
-            y=55,
+        # get output button
+        self.btn_get_output_dir = customtkinter.CTkButton(
+            master=self.app,
+            text='Select Output Directory',
+            command=self.get_output_dir,
             height=30,
             width=160
         )
 
-        # output label
-        self.label_selected_output_dir = tk.Label(
-            self.main_window,
-            text=self.selected_output_directory
+        self.btn_get_output_dir.place(
+            x=20,
+            y=55
+        )
+
+        # selected output label
+        self.label_selected_output_dir = customtkinter.CTkLabel(
+            master=self.app,
+            text=self.selected_output_directory,
+            height=30
         )
 
         self.label_selected_output_dir.place(
             x=200,
             y=55,
-            height=30
         )
 
-        # start process btn
-        self.btn_start = tk.Button(
-            self.main_window,
+        # start process button
+        self.btn_start = customtkinter.CTkButton(
+            master=self.app,
             text='Process Files',
-            command=self.build_file
-        )
-
-        self.btn_start.place(
-            x=20,
-            y=105,
+            command=self.build_file,
             height=30,
             width=160
         )
 
-        # launch window
-        self.main_window.mainloop()
+        self.btn_start.place(
+            x=20,
+            y=105
+        )
+
+        # calculate to launch on center of screen
+        app_width = 800
+        app_height = 200
+        x = (self.app.winfo_screenwidth()/2) - (app_width/2)
+        y = (self.app.winfo_screenheight()/2) - (app_height/2)
+        self.app.geometry('%dx%d+%d+%d' % (app_width, app_height, x, y))
+        self.app.resizable(False, False)
+        self.app.mainloop()
 
     # set the payload dir
     def get_payload_dir(self) -> None:
@@ -90,7 +99,7 @@ class Vlaakith:
 
         if payload_dir:
             self.selected_payload_directory = payload_dir
-            self.label_selected_payload_dir['text'] = payload_dir
+            self.label_selected_payload_dir.configure(text=payload_dir)
 
     # set the output dir
     def get_output_dir(self) -> None:
@@ -98,7 +107,7 @@ class Vlaakith:
 
         if output_dir:
             self.selected_output_directory = output_dir
-            self.label_selected_output_dir['text'] = output_dir
+            self.label_selected_output_dir.configure(text=output_dir)
 
     # start process
     def build_file(self) -> None:
@@ -122,15 +131,27 @@ class Vlaakith:
                         frames.append(df)
 
                     except Exception as e:
-                        messagebox.showerror('Error', e)
+                        CTkMessagebox(
+                            title="Error",
+                            icon='cancel',
+                            message=e
+                        )
 
             # concat all dataframes from the list to 1 singular dataframe and output the csv
             df_merged = pd.concat(frames)
             df_merged.to_csv(f'{output_directory}/concatenated.csv')
-            messagebox.showinfo('Success', 'Processing completed')
+            CTkMessagebox(
+                title='Success',
+                icon='check',
+                message='Processing completed'
+            )
 
         except Exception as e:
-            messagebox.showerror('Error', e)
+            CTkMessagebox(
+                title='Error',
+                icon='cancel',
+                message=e
+            )
 
 
 def main():
