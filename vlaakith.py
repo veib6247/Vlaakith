@@ -17,6 +17,7 @@ class Vlaakith:
         self.app.title('Vlaakith | BIP Export Concatenator')
         self.selected_payload_directory = 'Select a payload directory...'
         self.selected_output_directory = 'Select an output directory...'
+        self.skipped_file_counter = 0
 
         # get payload button
         self.btn_get_payload_dir = customtkinter.CTkButton(
@@ -84,6 +85,18 @@ class Vlaakith:
             y=105
         )
 
+        # label for skipped files
+        self.label_skipped_file_counter = customtkinter.CTkLabel(
+            master=self.app,
+            text=f'Skipped files: {self.skipped_file_counter}',
+            height=30
+        )
+
+        self.label_skipped_file_counter.place(
+            x=20,
+            y=145,
+        )
+
         # calculate to launch on center of screen
         app_width = 800
         app_height = 200
@@ -121,14 +134,23 @@ class Vlaakith:
             for file in os.listdir(payload_directory):
                 if file.endswith('.csv'):
                     try:
+
                         df = pd.read_csv(
                             f'{payload_directory}/{file}',
-                            encoding='ISO-8859-1',
-                            index_col='ShortId'
+                            encoding='ISO-8859-1'
                         )
 
-                        # add each new df to a list
-                        frames.append(df)
+                        if 'ShortId' in df.columns:
+                            df = df.set_index(['ShortId'])
+                            # add each new df to a list
+                            frames.append(df)
+
+                        else:
+                            self.skipped_file_counter += 1
+                            self.label_skipped_file_counter.configure(
+                                text=f'Skipped files: {
+                                    self.skipped_file_counter}'
+                            )
 
                     except Exception as e:
                         CTkMessagebox(
@@ -136,6 +158,9 @@ class Vlaakith:
                             icon='cancel',
                             message=e
                         )
+
+            # reset skipped files counter
+            self.skipped_file_counter = 0
 
             # concat all dataframes from the list to 1 singular dataframe and output the csv
             df_merged = pd.concat(frames)
