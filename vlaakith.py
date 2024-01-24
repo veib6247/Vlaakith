@@ -129,20 +129,20 @@ class Vlaakith:
         output_directory = self.selected_output_directory
         frames = []
 
+        # loop through each csv file in dir
         try:
-            # loop through each csv file in dir
             for file in os.listdir(payload_directory):
                 if file.endswith('.csv'):
                     try:
-
                         df = pd.read_csv(
                             f'{payload_directory}/{file}',
                             encoding='ISO-8859-1'
                         )
 
+                        # add only valid new df to a list
+                        # csv file should contain 'ShortId' column
                         if 'ShortId' in df.columns:
                             df = df.set_index(['ShortId'])
-                            # add each new df to a list
                             frames.append(df)
 
                         else:
