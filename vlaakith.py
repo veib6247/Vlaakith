@@ -154,6 +154,7 @@ class Vlaakith:
 
                     except Exception as e:
                         CTkMessagebox(
+                            master=self.app,
                             title="Error",
                             icon='cancel',
                             message=e
@@ -166,6 +167,7 @@ class Vlaakith:
             df_merged = pd.concat(frames)
             df_merged.to_csv(f'{output_directory}/concatenated.csv')
             CTkMessagebox(
+                master=self.app,
                 title='Success',
                 icon='check',
                 message='Processing completed'
@@ -173,6 +175,7 @@ class Vlaakith:
 
         except Exception as e:
             CTkMessagebox(
+                master=self.app,
                 title='Error',
                 icon='cancel',
                 message=e
