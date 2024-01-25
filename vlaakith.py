@@ -98,16 +98,16 @@ class Vlaakith:
             y=145,
         )
 
-        # label for skipped file names
-        self.label_skipped_file_names = customtkinter.CTkLabel(
+        # textox for skipped file names
+        self.textbox_file_names = customtkinter.CTkTextbox(
             master=self.app,
-            text=f'Skipped file names: {self.skipped_file_names}',
-            height=30
+            width=700,
+            height=100
         )
 
-        self.label_skipped_file_names.place(
+        self.textbox_file_names.place(
             x=20,
-            y=200,
+            y=170,
         )
 
         # calculate to launch on center of screen
@@ -168,7 +168,7 @@ class Vlaakith:
                                 frames.append(df)
 
                             else:
-                                # show which files were skipped because of missing index column
+                                # count files were skipped because of missing index column
                                 self.skipped_file_names.append(file)
                                 self.skipped_file_counter += 1
 
@@ -176,12 +176,6 @@ class Vlaakith:
                                 self.label_skipped_file_counter.configure(
                                     text=f'Skipped files: {
                                         self.skipped_file_counter}'
-                                )
-
-                                # update label for skipped file names
-                                self.label_skipped_file_names.configure(
-                                    text=f'Skipped file names: {
-                                        self.skipped_file_names}'
                                 )
 
                         except Exception as e:
@@ -194,6 +188,17 @@ class Vlaakith:
 
                 # reset skipped files counter and names
                 self.skipped_file_counter = 0
+
+                # clear textbox
+                self.textbox_file_names.delete('0.0', 'end')
+
+                # update textbox for skipped file names
+                for index, file_name in enumerate(self.skipped_file_names):
+                    self.textbox_file_names.insert(
+                        f'{index}.0',
+                        f'{file_name}\n'
+                    )
+
                 self.skipped_file_names.clear()
 
                 # concat all dataframes from the list to 1 singular dataframe and output the csv
