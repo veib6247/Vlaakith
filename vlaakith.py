@@ -15,9 +15,10 @@ class Vlaakith:
         # build window
         self.app = customtkinter.CTk()
         self.app.title('Vlaakith | BIP Export Concatenator')
-        self.selected_payload_directory = 'Select a payload directory...'
-        self.selected_output_directory = 'Select an output directory...'
+        self.selected_payload_directory = ''
+        self.selected_output_directory = ''
         self.skipped_file_counter = 0
+        self.skipped_file_names = []
 
         # get payload button
         self.btn_get_payload_dir = customtkinter.CTkButton(
@@ -36,7 +37,7 @@ class Vlaakith:
         # selected payload label
         self.label_selected_payload_dir = customtkinter.CTkLabel(
             master=self.app,
-            text=self.selected_payload_directory,
+            text='Select a payload directory...',
             height=30
         )
 
@@ -62,7 +63,7 @@ class Vlaakith:
         # selected output label
         self.label_selected_output_dir = customtkinter.CTkLabel(
             master=self.app,
-            text=self.selected_output_directory,
+            text='Select an output directory...',
             height=30
         )
 
@@ -85,7 +86,7 @@ class Vlaakith:
             y=105
         )
 
-        # label for skipped files
+        # label for skipped files counter
         self.label_skipped_file_counter = customtkinter.CTkLabel(
             master=self.app,
             text=f'Skipped files: {self.skipped_file_counter}',
@@ -97,9 +98,21 @@ class Vlaakith:
             y=145,
         )
 
+        # label for skipped file names
+        self.label_skipped_file_names = customtkinter.CTkLabel(
+            master=self.app,
+            text=f'Skipped file names: {self.skipped_file_names}',
+            height=30
+        )
+
+        self.label_skipped_file_names.place(
+            x=20,
+            y=200,
+        )
+
         # calculate to launch on center of screen
         app_width = 800
-        app_height = 200
+        app_height = 300
         x = (self.app.winfo_screenwidth()/2) - (app_width/2)
         y = (self.app.winfo_screenheight()/2) - (app_height/2)
         self.app.geometry('%dx%d+%d+%d' % (app_width, app_height, x, y))
@@ -129,57 +142,79 @@ class Vlaakith:
         output_directory = self.selected_output_directory
         frames = []
 
-        # loop through each csv file in dir
-        try:
-            for file in os.listdir(payload_directory):
-                if file.endswith('.csv'):
-                    try:
-                        df = pd.read_csv(
-                            f'{payload_directory}/{file}',
-                            encoding='ISO-8859-1'
-                        )
+        if not payload_directory or not output_directory:
+            CTkMessagebox(
+                master=self.app,
+                title='Missing Directories',
+                icon='cancel',
+                message='Please select the required directories!'
+            )
 
-                        # add only valid new df to a list
-                        # csv file should contain 'ShortId' column
-                        if 'ShortId' in df.columns:
-                            df = df.set_index(['ShortId'])
-                            frames.append(df)
-
-                        else:
-                            self.skipped_file_counter += 1
-                            self.label_skipped_file_counter.configure(
-                                text=f'Skipped files: {
-                                    self.skipped_file_counter}'
+        else:
+            try:
+                # loop through each csv file in dir
+                for file in os.listdir(payload_directory):
+                    if file.endswith('.csv'):
+                        try:
+                            df = pd.read_csv(
+                                f'{payload_directory}/{file}',
+                                encoding='ISO-8859-1'
                             )
 
-                    except Exception as e:
-                        CTkMessagebox(
-                            master=self.app,
-                            title="Error",
-                            icon='cancel',
-                            message=e
-                        )
+                            # add only valid new df to a list
+                            # csv file should contain 'ShortId' column
+                            if 'ShortId' in df.columns:
+                                df = df.set_index(['ShortId'])
+                                frames.append(df)
 
-            # reset skipped files counter
-            self.skipped_file_counter = 0
+                            else:
+                                # show which files were skipped because of missing index column
+                                self.skipped_file_names.append(file)
+                                self.skipped_file_counter += 1
 
-            # concat all dataframes from the list to 1 singular dataframe and output the csv
-            df_merged = pd.concat(frames)
-            df_merged.to_csv(f'{output_directory}/concatenated.csv')
-            CTkMessagebox(
-                master=self.app,
-                title='Success',
-                icon='check',
-                message='Processing completed'
-            )
+                                # update label for skipped file counter
+                                self.label_skipped_file_counter.configure(
+                                    text=f'Skipped files: {
+                                        self.skipped_file_counter}'
+                                )
 
-        except Exception as e:
-            CTkMessagebox(
-                master=self.app,
-                title='Error',
-                icon='cancel',
-                message=e
-            )
+                                # update label for skipped file names
+                                self.label_skipped_file_names.configure(
+                                    text=f'Skipped file names: {
+                                        self.skipped_file_names}'
+                                )
+
+                        except Exception as e:
+                            CTkMessagebox(
+                                master=self.app,
+                                title="Error",
+                                icon='cancel',
+                                message=e
+                            )
+
+                # reset skipped files counter and names
+                self.skipped_file_counter = 0
+                self.skipped_file_names.clear()
+
+                # concat all dataframes from the list to 1 singular dataframe and output the csv
+                df_merged = pd.concat(frames)
+                df_merged.to_csv(f'{output_directory}/concatenated.csv')
+
+                CTkMessagebox(
+                    master=self.app,
+                    title='Success',
+                    icon='check',
+                    message='Processing completed'
+                )
+
+            except Exception as e:
+                # display error in case parsing fails
+                CTkMessagebox(
+                    master=self.app,
+                    title='Error',
+                    icon='cancel',
+                    message=e
+                )
 
 
 def main():
