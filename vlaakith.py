@@ -152,6 +152,10 @@ class Vlaakith:
             )
 
         else:
+            # fancy console start thingy
+            console_label = ' READING CSV IN PROGRESS '
+            print(f'{console_label:-^100}')
+
             try:
                 # loop through each csv file in dir
                 # using progress bar here to update in console
@@ -206,6 +210,10 @@ class Vlaakith:
                 # concat all dataframes from the list to 1 singular dataframe and output the csv
                 df_merged = pd.concat(frames)
                 df_merged.to_csv(f'{output_directory}/concatenated.csv')
+
+                # fancy console end thingy
+                console_label = ' COMPLETE '
+                print(f'{console_label:-^100}')
 
                 CTkMessagebox(
                     master=self.app,
