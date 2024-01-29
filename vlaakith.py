@@ -2,6 +2,7 @@ import os
 
 import customtkinter
 import pandas as pd
+import progressbar
 from CTkMessagebox import CTkMessagebox
 from customtkinter import filedialog
 
@@ -152,8 +153,10 @@ class Vlaakith:
 
         else:
             try:
+                bar = progressbar.ProgressBar()
+
                 # loop through each csv file in dir
-                for file in os.listdir(payload_directory):
+                for file in bar(os.listdir(payload_directory)):
                     if file.endswith('.csv'):
                         try:
                             df = pd.read_csv(
