@@ -4,7 +4,7 @@ import customtkinter
 import pandas as pd
 from CTkMessagebox import CTkMessagebox
 from customtkinter import filedialog
-from progressbar import progressbar
+from tqdm import tqdm
 
 
 class Vlaakith:
@@ -159,7 +159,7 @@ class Vlaakith:
             try:
                 # loop through each csv file in dir
                 # using progress bar here to update in console
-                for file in progressbar(iterator=os.listdir(payload_directory)):
+                for file in tqdm(os.listdir(payload_directory)):
                     if file.endswith('.csv'):
                         try:
                             df = pd.read_csv(
