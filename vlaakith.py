@@ -155,7 +155,7 @@ class Vlaakith:
             try:
                 # loop through each csv file in dir
                 # using progress bar here to update in console
-                for file in progressbar(os.listdir(payload_directory)):
+                for file in progressbar(iterator=os.listdir(payload_directory)):
                     if file.endswith('.csv'):
                         try:
                             df = pd.read_csv(
