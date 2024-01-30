@@ -24,7 +24,7 @@ class Vlaakith:
         # get payload button
         self.btn_get_payload_dir = customtkinter.CTkButton(
             master=self.app,
-            text='Select Payload Directory',
+            text='Payload Folder',
             command=self.get_payload_dir,
             height=30,
             width=160
@@ -50,7 +50,7 @@ class Vlaakith:
         # get output button
         self.btn_get_output_dir = customtkinter.CTkButton(
             master=self.app,
-            text='Select Output Directory',
+            text='Output Folder',
             command=self.get_output_dir,
             height=30,
             width=160
@@ -76,7 +76,9 @@ class Vlaakith:
         # start process button
         self.btn_start = customtkinter.CTkButton(
             master=self.app,
-            text='Process Files',
+            text='Start Process',
+            fg_color="#d7a200",
+            hover_color='#bf9000',
             command=self.build_file,
             height=30,
             width=160
